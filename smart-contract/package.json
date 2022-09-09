@@ -1,0 +1,25 @@
+{
+  "name": "p2p",
+  "version": "0.0.1",
+  "description": "A simple peer to peer crypto exchange",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "Rémy Baranx",
+  "license": "ISC",
+  "devDependencies": {
+    "@nomicfoundation/hardhat-chai-matchers": "^1.0.2",
+    "@nomiclabs/hardhat-ethers": "^2.1.0",
+    "@openzeppelin/test-helpers": "^0.5.15",
+    "chai": "^4.2.0",
+    "ethers": "^5.0.0",
+    "hardhat": "^2.10.1",
+    "mocha": "^10.0.0"
+  },
+  "dependencies": {
+    "@openzeppelin/contracts": "^4.7.0",
+    "chai-string": "^1.5.0"
+  }
+}
