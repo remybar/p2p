@@ -1,5 +1,5 @@
 import React from 'react';
-import { Button, Table, Row, Col, Tooltip, OverlayTrigger } from 'react-bootstrap';
+import { Container, Button, Table, Row, Col, Tooltip, OverlayTrigger } from 'react-bootstrap';
 
 class OfferTable extends React.Component {
 
@@ -19,7 +19,8 @@ class OfferTable extends React.Component {
 
   render() {
     return (
-      <Row className="m-5 justify-content-md-center">
+      this.props.offers.length > 0
+    ? <Row className="m-5 justify-content-md-center">
         <Table as={Col} md="auto" striped bordered hover variant="dark">
           <thead>
             <tr>
@@ -45,7 +46,7 @@ class OfferTable extends React.Component {
                 <td align="center">{offer.toTokenDisplayedAmount}</td>
                 <td align="center">
                   {
-                    offer.isMine
+                    offer.isMine && this.props.showMine
                     ? <span className="fst-italic">mine</span>
                     : <Button onClick={() => this.props.onAction(offer.id)}>{this.props.actionName}</Button>
                   }
@@ -55,6 +56,7 @@ class OfferTable extends React.Component {
           </tbody>
         </Table>
       </Row>
+      : <Container className="m-4 text-center text-white"><p>No offer.</p></Container>
     );
   }
 }

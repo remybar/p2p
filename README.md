@@ -1,4 +1,15 @@
-# Peer to peer exchange
+# Peer to peer decentralized exchange
+
+This is a personal project to learn Solidity development.
+This is basically a decentralized peer to peer exchange. 
+
+For example, Alice has a lot of tokens A but wants to buy some tokens B.
+She will create an offer saying "I sell 10 tokens A against 15 tokens B".
+John looks at the offer list and he's interested to buy some tokens A.
+So, he buy Alice's offer by giving 15 tokens B and receiving 10 tokens.
+At the same time, Alice's wallet is credited of 15 tokens B.
+
+Note that in the next version, a fee will be applied when an offer is sold.
 
 ## web3 stack
 
@@ -8,12 +19,13 @@ For this project, I use the following web3 stack:
 * Ethereum Web client library:  `ether.js`
 * Test framework: `mocha`
 * Assertion library: `chai`
-* `ethernal`
-
+* Local blockchain explorer: `ethernal` 
 
 ## how to build / deploy ?
 
 ### smart contract
+
+Go to the `smart-contract` folder and:
 * `npm install` to set-up the project.
 * `npx hardhat compile` to compile the smart contracts.
 * `npx hardhat test` to launch unit tests.
@@ -24,7 +36,15 @@ For this project, I use the following web3 stack:
   local hardhat node and be able to test the front-end.
 
 ### front-end
+
+Go to the `front-end` folder and:
 * `npm install` to set-up the project.
 * `npm start` to start a local server on http://localhost:3000
 
+# FAQ
+ 
+## Ethernal
 
+* Unable to find json artifact files while deploying/pushing some smart contracts to Ethernal ?
+
+Use `npx hardhat clean` to clean everything (i.e remove artifacts) and then recompile your contracts (`npx hardhat compile`)

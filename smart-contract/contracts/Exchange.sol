@@ -24,6 +24,8 @@ contract Exchange is Ownable {
     Offers.OfferSet _offers;
     Tokens.TokenSet _whitelistedTokens;
 
+    event LogDepositReceived(address addr);    
+
     event TokenWhitelisted(address addr);
     event TokenUnwhitelisted(address addr);
 
@@ -35,6 +37,19 @@ contract Exchange is Ownable {
         for(uint i = 0; i < tokenAddresses.length; i += 1) {
             whitelistToken(tokenAddresses[i]);
         }
+    }
+
+    /**
+     * TODO: something to implement here ?
+     */
+    fallback() external payable {
+    }
+
+    /**
+     * TODO: something to implement here ?
+     */
+    receive() external payable {
+        emit LogDepositReceived(msg.sender);
     }
 
     /**

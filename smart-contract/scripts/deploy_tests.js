@@ -1,5 +1,8 @@
+require('dotenv').config()
+
 const path = require('path');
 const fs = require('fs');
+const ethernal = require('hardhat-ethernal');
 
 /** ==========================================================================
  * 
@@ -7,6 +10,8 @@ const fs = require('fs');
  * front-end testing.
  *
  ========================================================================== */
+
+const ETHERNAL_WORKSPACE_NAME = "Black Market";
 
 const FRONT_END_CONTRACT_FILE = path.resolve(__dirname, '../../front-end/src/contracts/addresses.js');
 const CONTRACT_ABI_FILE = path.resolve(__dirname, '../artifacts/contracts/Exchange.sol/Exchange.json');
@@ -79,6 +84,10 @@ const deployTokens = async () => {
     }
     await Promise.all(tokens.map(async t => await t.deployed()));
 
+     await Promise.all(tokens.map(
+        async token => await hre.ethernal.push({ name: await token.name(), address: token.address })
+    ));
+
     for (token of tokens) {
         const desc = await stringifyToken(token);
         console.log("   ", desc);
@@ -104,6 +113,8 @@ const deployTokens = async () => {
  */
 const main = async () => {
 
+    await hre.ethernal.resetWorkspace(ETHERNAL_WORKSPACE_NAME);
+
     //---------------------------------------------------
     // DEPLOYING CONTRACTS ...
     //---------------------------------------------------
@@ -122,6 +133,8 @@ const main = async () => {
     const factory = await hre.ethers.getContractFactory('Exchange');
     const contract = await factory.deploy(whitelistedTokens.map(t => t.address));
     await contract.deployed();
+
+    await hre.ethernal.push({name: 'Exchange', address: contract.address});
 
     // create some offers
     const defaultOffers = [

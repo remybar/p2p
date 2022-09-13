@@ -10,6 +10,7 @@ import MyOffersView from './views/MyOffersView';
 import Navigation from './components/Navigation';
 import WalletSelector from './components/WalletSelector';
 import Footer from './components/Footer';
+import AlertList from './components/AlertList';
 
 import { CONTRACT_ADDRESS } from './contracts/addresses';
 import CONTRACT_ABI from './contracts/abi/Exchange.json';
@@ -37,9 +38,24 @@ class App extends React.Component {
       whitelistedTokens: [],
       whitelistedTokensInfo: [],
       offers: [],
+      alerts: [],
     };
   }
 
+  addAlert = (message, kind) => {
+    const lastId = this.state.alerts.length > 0 ? this.state.alerts.at(-1).id : 0;
+    const alerts = [...this.state.alerts, { id: lastId + 1, message, kind }];
+    this.setState({ alerts });
+  }
+
+  addSuccessAlert = (message) => this.addAlert(message, 'success');
+  addErrorAlert = (message) => this.addAlert(message, 'danger');
+
+  dismissAlert = (id) => {
+    const alerts = this.state.alerts.filter(a => a.id !== id);
+    this.setState({ alerts });
+  }
+  
   setAccount = (account) => {
     this.setState({ account: account ? account.toUpperCase() : null });
   }
@@ -56,6 +72,23 @@ class App extends React.Component {
     if (!this.state.account) return [];
     return this.state.offers.filter(o => o.isMine);
   }
+
+  displayableOffers = (offers) => offers.map(offer => (
+    {
+    ...offer,
+    fromTokenName: this.state.whitelistedTokensInfo.get(offer.fromToken).symbol,
+    fromTokenDisplayedAmount: toDisplayedAmount(
+      offer.fromTokenAmount,
+      this.state.whitelistedTokensInfo.get(offer.fromToken).decimals
+    ), 
+    toTokenName: this.state.whitelistedTokensInfo.get(offer.toToken).symbol,
+    toTokenDisplayedAmount: toDisplayedAmount(
+      offer.toTokenAmount,
+      this.state.whitelistedTokensInfo.get(offer.toToken).decimals
+    ),
+    isMine: this.isOwner(offer.owner)
+    }
+  ));
 
   // initialize application data (mainly coming from our smart contract)
   initializeData = async () => {
@@ -92,56 +125,55 @@ class App extends React.Component {
 
   whitelistToken = async (addr) => {
     if (this.state.contract) {
-      const tx = await this.state.contract.whitelistToken(addr);
-
       const provider = new ethers.providers.Web3Provider(window.ethereum);
-      await provider.waitForTransaction(tx.hash).then(() => {
-        this.loadWhitelistedTokens(this.state.contract);
-      });
+
+      try {
+        const tx = await this.state.contract.whitelistToken(addr);
+        await provider.waitForTransaction(tx.hash).then(() => {
+          this.loadWhitelistedTokens(this.state.contract);
+          this.addSuccessAlert(`Token whitelisted!`);
+        })
+      }
+      catch(error) {
+        this.addErrorAlert('Unable to whitelist this token address');
+      }
     }
   }
 
   unwhitelistToken = async (addr) => {
     if (this.state.contract) {
-      const tx = await this.state.contract.unwhitelistToken(addr);
-
       const provider = new ethers.providers.Web3Provider(window.ethereum);
-      await provider.waitForTransaction(tx.hash).then(() => {
-        this.loadWhitelistedTokens(this.state.contract);
-      });
+
+      try {
+        const tx = await this.state.contract.unwhitelistToken(addr);
+
+        await provider.waitForTransaction(tx.hash).then(() => {
+          this.loadWhitelistedTokens(this.state.contract);
+          this.addSuccessAlert(`Token unwhitelisted!`);
+        });
+      }
+      catch(error) {
+        this.addErrorAlert('Unable to unwhitelist this token');
+      }
     }
   }
 
   loadOffers = async () => {
     if (this.state.contract) {
-      const offers = await this.state.contract.getOffers();
-
-      const updatedOffers = offers.map(offer => {
-        return {
-          ...offer,
-          fromTokenName: this.state.whitelistedTokensInfo.get(offer.fromToken).symbol,
-          fromTokenDisplayedAmount: toDisplayedAmount(
-            offer.fromTokenAmount,
-            this.state.whitelistedTokensInfo.get(offer.fromToken).decimals
-          ), 
-          toTokenName: this.state.whitelistedTokensInfo.get(offer.toToken).symbol,
-          toTokenDisplayedAmount: toDisplayedAmount(
-            offer.toTokenAmount,
-            this.state.whitelistedTokensInfo.get(offer.toToken).decimals
-          ),
-          isMine: this.isOwner(offer.owner)
-        };
-      });
-
-      this.setState({ offers: updatedOffers });
+      try {
+        const offers = await this.state.contract.getOffers();
+        const updatedOffers = this.displayableOffers(offers);
+        this.setState({ offers: updatedOffers });
+      }
+      catch(error) {
+        this.addErrorAlert('Unable to load offers');
+      }
     }
   }
 
   createOffer = async (fromTokenAddress, fromTokenAmount, toTokenAddress, toTokenAmount) => {
     if (this.state.contract) {
       const provider = new ethers.providers.Web3Provider(window.ethereum);
-
-      console.log(this.state);
 
       const fromTokenAmountBS = ethers.utils.parseUnits(
         fromTokenAmount,
@@ -154,20 +186,32 @@ class App extends React.Component {
       
       // first, the seller must allow our smart contract to get "fromToken" from his wallet
       const erc20 = this.createContract(fromTokenAddress, ERC20_ABI);
-      const allowanceTx = await erc20.increaseAllowance(this.state.contract.address, fromTokenAmountBS);
 
-      // then, create the offer
-      await provider.waitForTransaction(allowanceTx.hash).then(async () => {
-        const offerTx = await this.state.contract.createOffer(
-          fromTokenAddress,
-          fromTokenAmountBS,
-          toTokenAddress,
-          toTokenAmountBS
-        );
-        await provider.waitForTransaction(offerTx.hash).then(() => {
-          this.loadOffers();
+      try {
+        const allowanceTx = await erc20.increaseAllowance(this.state.contract.address, fromTokenAmountBS);
+
+        // then, create the offer
+        await provider.waitForTransaction(allowanceTx.hash).then(async () => {
+          try {
+            const offerTx = await this.state.contract.createOffer(
+              fromTokenAddress,
+              fromTokenAmountBS,
+              toTokenAddress,
+              toTokenAmountBS
+            );
+            await provider.waitForTransaction(offerTx.hash).then(() => {
+              this.loadOffers();
+              this.addSuccessAlert("Offer created!");
+            });
+          }
+          catch (error) {
+            this.addErrorAlert("Unable to create a new offer");
+          }
         });
-      });
+      }
+      catch (error) {
+        this.addErrorAlert("Token transfer not allowed by the owner");
+      }
     }
   }
 
@@ -180,30 +224,48 @@ class App extends React.Component {
       console.log("found offer:", offer);
 
       if (offer) {
-        // first the buyer must allow our smart contract to get "toToken" from his wallet
-        const erc20 = this.createContract(offer.toToken, ERC20_ABI);
-        const allowanceTx = await erc20.increaseAllowance(this.state.contract.address, offer.toTokenAmount);
 
-        // then, buy the offer
-        await provider.waitForTransaction(allowanceTx.hash).then(async () => {
-          const offerTx = await this.state.contract.buyOffer(offerId);
-          
-          await provider.waitForTransaction(offerTx.hash).then(() => {
-            this.loadOffers();
+        try {
+          // first the buyer must allow our smart contract to get "toToken" from his wallet
+          const erc20 = this.createContract(offer.toToken, ERC20_ABI);
+          const allowanceTx = await erc20.increaseAllowance(this.state.contract.address, offer.toTokenAmount);
+
+          // then, buy the offer
+          await provider.waitForTransaction(allowanceTx.hash).then(async () => {
+            try {
+              const offerTx = await this.state.contract.buyOffer(offerId);
+              
+              await provider.waitForTransaction(offerTx.hash).then(() => {
+                this.loadOffers();
+                this.addSuccessAlert("Offer bought!");
+              });
+            }
+            catch (error) {
+              this.addErrorAlert("Unable to buy this offer");
+            }
           });
-        });
+        }
+        catch (error) {
+          this.addErrorAlert("Token transfer cancelled");
+        }
       }
     }
   }
 
   removeOffer = async (offerId) => {
     if (this.state.contract) {
-      const tx = await this.state.contract.cancelOffer(offerId);
+      try {
+        const tx = await this.state.contract.cancelOffer(offerId);
 
-      const provider = new ethers.providers.Web3Provider(window.ethereum);
-      await provider.waitForTransaction(tx.hash).then(() => {
-        this.loadOffers();
-      });
+        const provider = new ethers.providers.Web3Provider(window.ethereum);
+        await provider.waitForTransaction(tx.hash).then(() => {
+          this.loadOffers();
+          this.addSuccessAlert("Offer removed!");
+        });
+      }
+      catch (error) {
+        this.addErrorAlert("Unable to remove this offer");
+      }
     }
   }
 
@@ -231,6 +293,7 @@ class App extends React.Component {
             isAdmin={this.state.isAdmin}
           />
         </Navigation>
+        <AlertList alerts={this.state.alerts} dismiss={this.dismissAlert}/>
         {this.state.account &&
           <Routes>
             <Route

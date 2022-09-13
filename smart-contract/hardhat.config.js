@@ -1,4 +1,6 @@
 require("@nomicfoundation/hardhat-chai-matchers");
+require('hardhat-ethernal');
+require('dotenv').config()
 
 // This is a sample Hardhat task. To learn how to create your own go to
 // https://hardhat.org/guides/create-task.html
@@ -20,12 +22,17 @@ module.exports = {
   solidity: "0.8.4",
 
   // export smart contract ABI to the front-end
-  abiExporter: {
+   abiExporter: {
     path: '../front-end/src/contracts/abi',
     runOnCompile: true,
     clear: true,
     flat: true,
     only: [':Exchange$'],
     spacing: 2,
+  },
+  ethernal: {
+    workspace: 'Black Market',
+    email: process.env.ETHERNAL_EMAIL,
+    password: process.env.ETHERNAL_PASSWORD,
   }
 };

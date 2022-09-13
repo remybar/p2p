@@ -4,22 +4,26 @@
   "description": "A simple peer to peer crypto exchange",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "node": "npx hardhat node",
+    "local": "npx hardhat run scripts/deploy_tests.js --network localhost"
   },
   "keywords": [],
   "author": "Rémy Baranx",
   "license": "ISC",
   "devDependencies": {
-    "@nomicfoundation/hardhat-chai-matchers": "^1.0.2",
-    "@nomiclabs/hardhat-ethers": "^2.1.0",
-    "@openzeppelin/test-helpers": "^0.5.15",
-    "chai": "^4.2.0",
-    "ethers": "^5.0.0",
-    "hardhat": "^2.10.1",
+    "@nomicfoundation/hardhat-chai-matchers": "^1.0.3",
+    "@nomiclabs/hardhat-ethers": "^2.1.1",
+    "@openzeppelin/test-helpers": "^0.5.16",
+    "chai": "^4.3.6",
+    "ethers": "^5.7.0",
+    "hardhat": "^2.11.1",
     "mocha": "^10.0.0"
   },
   "dependencies": {
-    "@openzeppelin/contracts": "^4.7.0",
-    "chai-string": "^1.5.0"
+    "@openzeppelin/contracts": "^4.7.3",
+    "chai-string": "^1.5.0",
+    "dotenv": "^16.0.2",
+    "ethernal": "^0.15.0",
+    "hardhat-ethernal": "^2.0.0"
   }
 }

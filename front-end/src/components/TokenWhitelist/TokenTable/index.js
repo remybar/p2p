@@ -1,10 +1,12 @@
 import React from 'react';
 import TokenRow from '../TokenRow';
+import { Container } from 'react-bootstrap';
 
 class TokenTable extends React.Component {
   render() {
     return (
-      <table className="table table-striped">
+      this.props.tokens.length > 0
+      ? <table className="table table-striped">
         <thead className="text-light">
           <tr>
             <th scope="col">Name</th>
@@ -27,6 +29,7 @@ class TokenTable extends React.Component {
           )}
         </tbody>
       </table>
+      : <Container className="m-4 text-center text-white"><p>No token.</p></Container>
     );
   }
 }

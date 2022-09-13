@@ -43,6 +43,15 @@ library Tokens {
     }
 
     /**
+     * @dev Convert an index in the `_values` array to a position.
+     * 
+     * @return the position.
+     */
+    function _indexToPosition(uint256 index) private pure returns (uint256) {
+        return index + 1;
+    }
+
+    /**
      * @dev Add a token address in the token set.
      * Metadata are retrieved thanks to the `IERC20Metadata` interface
      * using the token address.
@@ -85,7 +94,7 @@ library Tokens {
             TokenMetadata memory lastInfo = tokens._values[lastIndex];
 
             tokens._values[toDeleteIndex] = lastInfo;
-            tokens._positions[lastInfo.addr] = toDeleteIndex;
+            tokens._positions[lastInfo.addr] = _indexToPosition(toDeleteIndex);
         }
 
         // Delete the slot where the moved token was stored

@@ -321,5 +321,38 @@ describe("Exchange", function () {
       expect(await token2.balanceOf(user2.address)).equal(user2Token2balance.sub(toAmount));
       expect(await exchange.getOffers()).lengthOf(0);
     });
+
+    it("Should buy all the offers", async function () {
+      const fromAmount = [100, 200, 300, 400];
+      const toAmount = [400, 300, 200, 100];
+
+      await exchange.connect(user1).createOffer(token1.address, fromAmount[0], token2.address, toAmount[0]);
+      await exchange.connect(user1).createOffer(token1.address, fromAmount[1], token2.address, toAmount[1]);
+      await exchange.connect(user1).createOffer(token2.address, fromAmount[2], token1.address, toAmount[2]);
+      await exchange.connect(user1).createOffer(token2.address, fromAmount[3], token1.address, toAmount[3]);
+
+      await expect(exchange.connect(user2).buyOffer(2))
+        .to.emit(exchange, 'OfferBought')
+        .withArgs(2)
+        .to.emit(exchange, 'OfferRemoved')
+        .withArgs(2);
+      await expect(exchange.connect(user2).buyOffer(4))
+        .to.emit(exchange, 'OfferBought')
+        .withArgs(4)
+        .to.emit(exchange, 'OfferRemoved')
+        .withArgs(4);
+      await expect(exchange.connect(user2).buyOffer(1))
+        .to.emit(exchange, 'OfferBought')
+        .withArgs(1)
+        .to.emit(exchange, 'OfferRemoved')
+        .withArgs(1);
+      await expect(exchange.connect(user2).buyOffer(3))
+      .to.emit(exchange, 'OfferBought')
+      .withArgs(3)
+      .to.emit(exchange, 'OfferRemoved')
+      .withArgs(3);
+
+      expect(await exchange.getOffers()).lengthOf(0);
+    });
   });
 });

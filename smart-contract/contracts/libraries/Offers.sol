@@ -46,6 +46,15 @@ library Offers {
     }
 
     /**
+     * @dev Convert an index in the `_values` array to a position.
+     * 
+     * @return the position.
+     */
+    function _indexToPosition(uint256 index) private pure returns (uint256) {
+        return index + 1;
+    }
+
+    /**
      * @dev Add an offer in the offer set.
      * The offer ID is generated and set internally.
      *
@@ -91,7 +100,7 @@ library Offers {
                 Offer memory lastOffer = offers._values[lastIndex];
 
                 offers._values[toDeleteIndex] = lastOffer;
-                offers._positions[lastOffer.id] = toDeleteIndex;
+                offers._positions[lastOffer.id] = _indexToPosition(toDeleteIndex);
             }
 
             // Delete the slot where the moved offer was stored
