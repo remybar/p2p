@@ -1,10 +1,6 @@
 # TODOS:
 
 [MAJOR]
-  - améliorer le composant wallet
-    - détecter le mauvais réseau => render
-    - détecter la déconnexion du compte => render
-
   - analyse statique des smart contracts
 
   - compléter les tests unitaires des librairies

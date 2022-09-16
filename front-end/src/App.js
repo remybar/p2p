@@ -1,5 +1,6 @@
 import React from 'react';
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
+import { Row, Col, ListGroup } from 'react-bootstrap';
 import { ethers } from 'ethers';
 
 import './App.css';
@@ -15,7 +16,11 @@ import AlertList from './components/AlertList';
 import { CONTRACT_ADDRESS } from './contracts/addresses';
 import CONTRACT_ABI from './contracts/abi/Exchange.json';
 
-const ALLOWED_NETWORKS = ['31337'];
+const ALLOWED_NETWORKS = [
+  {name: 'Ethereum', chainId: '1'},
+  {name: 'Localhost', chainId: '31337'},
+  {name: 'Rinkeby', chainId: '4'}
+];
 
 // part of standard ERC-20 ABI to interact with ERC-20 token smart contracts
 // to be able to increase allowance and be able to transfer token to our
@@ -34,7 +39,7 @@ class App extends React.Component {
       account: null,
       contract: null,
       isAdmin: false,
-      networkStatus: true,
+      isExpectedNetwork: false,
       whitelistedTokens: [],
       whitelistedTokensInfo: [],
       offers: [],
@@ -61,7 +66,7 @@ class App extends React.Component {
   }
 
   setNetworkStatus = (status) => {
-    this.setState({ networkStatus: status });
+    this.setState({ isExpectedNetwork: status });
   }
 
   isOwner = (owner) => {
@@ -220,9 +225,6 @@ class App extends React.Component {
       const provider = new ethers.providers.Web3Provider(window.ethereum);
       const offer = this.state.offers.find(offer => offer.id === offerId);
 
-      console.log("offerId: ", offerId);
-      console.log("found offer:", offer);
-
       if (offer) {
 
         try {
@@ -287,47 +289,62 @@ class App extends React.Component {
           <WalletSelector
             account={this.state.account}
             setAccount={this.setAccount}
-            networks={ALLOWED_NETWORKS}
-            networkStatus={this.state.networkStatus}
+            expectedNetworks={ALLOWED_NETWORKS}
+            isExpectedNetwork={this.state.isExpectedNetwork}
             setNetworkStatus={this.setNetworkStatus}
             isAdmin={this.state.isAdmin}
           />
         </Navigation>
         <AlertList alerts={this.state.alerts} dismiss={this.dismissAlert}/>
-        {this.state.account &&
-          <Routes>
-            <Route
-              path="/"
-              element={
-                <OffersView
-                  offers={this.state.offers}
-                  buyOffer={this.buyOffer}
-                />
-              }
-            />
-            <Route
-              path="/my-offers"
-              element={
-                <MyOffersView
-                  offers={this.getMyOffers()}
-                  tokens={this.state.whitelistedTokens}
-                  createOffer={this.createOffer}
-                  removeOffer={this.removeOffer}
-                />
-              }
-            />
-            <Route
-              path="/admin"
-              element={
-                <AdminView
-                  isAdmin={this.state.isAdmin}
-                  tokens={this.state.whitelistedTokens}
-                  whitelist={this.whitelistToken}
-                  unwhitelist={this.unwhitelistToken}
-                />
-              }
-            />
-          </Routes>
+        {
+          this.state.account && this.state.isExpectedNetwork
+          ? <Routes>
+              <Route
+                path="/"
+                element={
+                  <OffersView
+                    offers={this.state.offers}
+                    buyOffer={this.buyOffer}
+                  />
+                }
+              />
+              <Route
+                path="/my-offers"
+                element={
+                  <MyOffersView
+                    offers={this.getMyOffers()}
+                    tokens={this.state.whitelistedTokens}
+                    createOffer={this.createOffer}
+                    removeOffer={this.removeOffer}
+                  />
+                }
+              />
+              <Route
+                path="/admin"
+                element={
+                  <AdminView
+                    isAdmin={this.state.isAdmin}
+                    tokens={this.state.whitelistedTokens}
+                    whitelist={this.whitelistToken}
+                    unwhitelist={this.unwhitelistToken}
+                  />
+                }
+              />
+            </Routes>
+          : <Row className="m-5 text-white text-center">
+              <Col>
+                  {
+                    !this.state.account
+                    ? <h1>Please connect to a wallet.</h1>
+                    : <>
+                        <h1>Please select a correct network</h1>
+                        <p>
+                          Accepted: { ALLOWED_NETWORKS.map(n => n.name).join(' | ') }
+                        </p>
+                      </>
+                  }
+              </Col>
+              </Row>
         }
         <Footer />
       </Router>
