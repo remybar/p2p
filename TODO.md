@@ -1,7 +1,13 @@
 # TODOS:
 
 [MAJOR]
-  - analyse statique des smart contracts
+  - Github actions
+    - Récupérer proprement les résultats (log, etc ...)
+      - résultat du lint
+      - résultat coverage
+
+    - avoir un tag dans le README.md du repository
+      - splitter les jobs pour avoir un état de tests / static analysis / linting ?
 
   - compléter les tests unitaires des librairies
 

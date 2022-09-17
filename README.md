@@ -1,5 +1,11 @@
 # Peer to peer decentralized exchange
 
+![ci](https://github.com/remybar/p2p/actions/workflows/ci.yml/badge.svg)
+
+[Code coverage](https://app.codecov.io/gh/remybar/p2p)
+
+## Description
+
 This is a personal project to learn Solidity development.
 This is basically a decentralized peer to peer exchange. 
 

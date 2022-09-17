@@ -1,13 +1,6 @@
-const ethernal = require('hardhat-ethernal');
-
 const main = async () => {
     const factory = await hre.ethers.getContractFactory('Exchange');
     const contract = await factory.deploy([]);
-
-    await hre.ethernal.push({
-        name: 'Exchange',
-        address: contract.address
-    });
 
     await contract.deployed();
     console.log("Contract deployed to:", contract.address);
