@@ -1,5 +1,11 @@
 # Peer to peer decentralized exchange
 
+![ci](https://github.com/remybar/p2p/actions/workflows/ci.yml/badge.svg)
+
+[Code coverage results](https://app.codecov.io/gh/remybar/p2p)
+
+## Description
+
 This is a personal project to learn Solidity development.
 This is basically a decentralized peer to peer exchange. 
 
@@ -19,7 +25,6 @@ For this project, I use the following web3 stack:
 * Ethereum Web client library:  `ether.js`
 * Test framework: `mocha`
 * Assertion library: `chai`
-* Local blockchain explorer: `ethernal` 
 
 ## how to build / deploy ?
 
@@ -41,10 +46,10 @@ Go to the `front-end` folder and:
 * `npm install` to set-up the project.
 * `npm start` to start a local server on http://localhost:3000
 
-# FAQ
- 
-## Ethernal
+# CI/CD
 
-* Unable to find json artifact files while deploying/pushing some smart contracts to Ethernal ?
-
-Use `npx hardhat clean` to clean everything (i.e remove artifacts) and then recompile your contracts (`npx hardhat compile`)
+Thanks to Github actions, each time a commit is done on the `master` branch or a pull request is created, the following steps are done:
+* executing unit tests and publishing a clean test report,
+* running unit tests with code coverage analysis and publishing coverage result [here](https://app.codecov.io/gh/remybar/p2p),
+* running a linter ([solhint](https://github.com/protofire/solhint)) on smart contracts files (At the moment, linting results are only visible in Github actions logs),
+* running a static analyzer ([slither](https://github.com/crytic/slither)) and exporting analysis results in the `Security` tab on the Github page of this project)

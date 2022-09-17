@@ -1,10 +1,5 @@
 # TODOS:
 
-[MAJOR]
-  - analyse statique des smart contracts
-
-  - compléter les tests unitaires des librairies
-
 [DEPLOIEMENT]
   - process propre de déploiement sur testnet
 
@@ -18,7 +13,6 @@ Version 0.2:
   - review du contrat, version des points sécurité
   - cleaner les tests
   - mettre en place la CI/CD et procédure d'upgrade.
-  - test en local
   - test sur testnet
   - 🚀 déploiement mainnet 🚀
 

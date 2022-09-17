@@ -4,7 +4,11 @@
   "description": "A simple peer to peer crypto exchange",
   "main": "index.js",
   "scripts": {
+    "lint": "npx solhint --max-warnings 0 'contracts/**/*.sol'",
     "node": "npx hardhat node",
+    "test": "npx hardhat test",
+    "test-json": "MOCHA_REPORTER=json npx hardhat test | sed -n '/^{$/,$p' > test-results.json",
+    "coverage": "npx hardhat coverage",
     "local": "npx hardhat run scripts/deploy_tests.js --network localhost"
   },
   "keywords": [],
@@ -12,18 +16,18 @@
   "license": "ISC",
   "devDependencies": {
     "@nomicfoundation/hardhat-chai-matchers": "^1.0.3",
+    "@nomicfoundation/solidity-analyzer": "^0.1.0",
     "@nomiclabs/hardhat-ethers": "^2.1.1",
     "@openzeppelin/test-helpers": "^0.5.16",
     "chai": "^4.3.6",
     "ethers": "^5.7.0",
     "hardhat": "^2.11.1",
-    "mocha": "^10.0.0"
+    "mocha": "^10.0.0",
+    "solhint": "^3.3.7",
+    "solidity-coverage": "^0.8.2"
   },
   "dependencies": {
     "@openzeppelin/contracts": "^4.7.3",
-    "chai-string": "^1.5.0",
-    "dotenv": "^16.0.2",
-    "ethernal": "^0.15.0",
-    "hardhat-ethernal": "^2.0.0"
+    "chai-string": "^1.5.0"
   }
 }

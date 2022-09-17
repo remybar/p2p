@@ -1,6 +1,5 @@
 require("@nomicfoundation/hardhat-chai-matchers");
-require('hardhat-ethernal');
-require('dotenv').config()
+require("solidity-coverage");
 
 // This is a sample Hardhat task. To learn how to create your own go to
 // https://hardhat.org/guides/create-task.html
@@ -21,6 +20,10 @@ task("accounts", "Prints the list of accounts", async (taskArgs, hre) => {
 module.exports = {
   solidity: "0.8.4",
 
+  mocha: {
+    reporter: process.env.MOCHA_REPORTER ?? "spec"
+  },
+
   // export smart contract ABI to the front-end
    abiExporter: {
     path: '../front-end/src/contracts/abi',
@@ -30,9 +33,4 @@ module.exports = {
     only: [':Exchange$'],
     spacing: 2,
   },
-  ethernal: {
-    workspace: 'Black Market',
-    email: process.env.ETHERNAL_EMAIL,
-    password: process.env.ETHERNAL_PASSWORD,
-  }
 };
